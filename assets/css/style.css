@@ -405,9 +405,8 @@ a:hover {
         border-right: none;
         border-top: 1px solid rgba(74, 27, 109, 0.1);
         padding: 10px;
-        flex-direction: row;
+        display: block;
         z-index: 100;
-        align-items: center;
         box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
     }
     .sidebar .logo {
@@ -419,9 +418,14 @@ a:hover {
         gap: 8px;
         margin-bottom: 0;
         padding-bottom: 5px;
+        width: 100%;
+        -webkit-overflow-scrolling: touch;
     }
     .nav-links::-webkit-scrollbar {
         display: none;
+    }
+    .nav-links li {
+        flex-shrink: 0;
     }
     .nav-links a {
         padding: 8px 14px;

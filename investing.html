@@ -74,8 +74,8 @@
             </div>
         </div>
 
-        <div id="premium-section">
-            <div id="premium-content" style="filter: blur(12px); opacity: 0.5; transition: all 0.4s ease-in-out;">
+        <div id="premium-section" style="position: relative;">
+            <div id="premium-content" style="filter: blur(8px); opacity: 0.6; pointer-events: none; user-select: none;">
                 
                 <h3>Edit Strategy</h3>
         <p class="text-muted mb-2">Change your auto-investing profile. This adjusts future buys.</p>
@@ -117,10 +117,11 @@
                 </div>
                 <button class="btn btn-outline">Connect Market</button>
             </div>
+        </div>
             </div>
             
-            <div id="premium-overlay" style="text-align: center; margin-top: 2rem;">
-                <button class="btn btn-primary" onclick="alert('Forwarding to application...')">Start Investing</button>
+            <div id="premium-overlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; z-index: 10;">
+                <a href="https://example.com/broker" target="_blank" class="btn btn-primary" style="font-size: 1.25rem; padding: 16px 32px; box-shadow: 0 8px 25px rgba(74, 27, 109, 0.3);">Start Investing</a>
             </div>
         </div>
 
@@ -168,21 +169,7 @@
         
         createDonutChart(ctx, [eq, bo], ['Equities', 'Bonds/Cash'], true);
 
-        // Scroll to reveal logic
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                const content = document.getElementById('premium-content');
-                if (entry.isIntersecting) {
-                    content.style.filter = 'none';
-                    content.style.opacity = '1';
-                } else {
-                    content.style.filter = 'blur(12px)';
-                    content.style.opacity = '0.5';
-                }
-            });
-        }, { threshold: 0.65 }); // Triggers only when 65% of the section is visible
-        
-        observer.observe(document.getElementById('premium-section'));
+        // Blur is static; redirect button handles access
     });
 
     function setStrat(strat) {
