@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Platform Sim</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="app-container">
+    <div id="sidebar-container"></div>
+
+    <main class="main-content">
+        <header class="page-header">
+            <div>
+                <h1 style="margin-bottom: 0;">Welcome back, <span class="user-name"></span></h1>
+                <p class="text-muted">Here's your financial overview</p>
+            </div>
+            <div class="user-profile">
+                <div class="avatar"></div>
+                <div>
+                    <div class="user-name" style="font-weight: 600; font-size: 0.9rem;"></div>
+                    <div class="text-muted" style="font-size: 0.8rem;" id="user-role"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Net Worth Overview -->
+        <div class="card card-dark flex-between" style="padding: 2rem;">
+            <div>
+                <p style="color: var(--color-bg-alt); text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; margin-bottom: 8px;">Total Net Worth</p>
+                <h1 style="font-size: 3rem; margin-bottom: 0;" id="nw-total">€0.00</h1>
+            </div>
+            <div class="net-worth-badge">
+                <div class="nw-part nw-assets">
+                    <span class="label">Assets</span>
+                    <span class="val" id="nw-assets">€0.00</span>
+                </div>
+                <div class="nw-part nw-liabs">
+                    <span class="label">Liabilities</span>
+                    <span class="val" id="nw-liabs">€0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Center -->
+        <div id="action-center"></div>
+
+        <!-- Sources Grid -->
+        <div class="grid-4">
+            <a href="pensions.html" class="card" style="text-align: center;">
+                <p class="text-muted mb-1">Pension (1st & 2nd)</p>
+                <h3 id="dash-pension" class="value-positive">€0.00</h3>
+                <p class="text-muted" style="font-size: 0.8rem;" id="dash-pension-yield"></p>
+            </a>
+            <a href="mortgages.html" class="card" style="text-align: center;">
+                <p class="text-muted mb-1">Mortgage & Loans</p>
+                <h3 id="dash-mortgage" class="value-negative">€0.00</h3>
+                <p class="text-muted" style="font-size: 0.8rem;" id="dash-mortgage-rate"></p>
+            </a>
+            <a href="investing.html" class="card" style="text-align: center;">
+                <p class="text-muted mb-1">Investments</p>
+                <h3 id="dash-investments" class="value-positive">€0.00</h3>
+                <p class="text-muted" style="font-size: 0.8rem;" id="dash-invest-yield"></p>
+            </a>
+            <a href="pillar-pensions.html" class="card" style="text-align: center;">
+                <p class="text-muted mb-1">3rd Pillar</p>
+                <h3 id="dash-pillar" class="value-positive">€0.00</h3>
+                <p class="text-muted" style="font-size: 0.8rem;" id="dash-pillar-tax"></p>
+            </a>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="grid-2 mt-2">
+            <div class="card">
+                <h3>Where your money is</h3>
+                <p class="text-muted mb-3">Asset breakdown across platforms</p>
+                <div class="chart-container">
+                    <canvas id="assetsChart"></canvas>
+                </div>
+            </div>
+            <div class="card card-dark">
+                <h3>10-Year Projection</h3>
+                <p style="color: var(--color-bg-alt); margin-bottom: 1.5rem;">Expected growth based on current strategy</p>
+                <div class="chart-container">
+                    <canvas id="projectionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/nav.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const user = getPersona();
+        if (!user) {
+            window.location.href = 'index.html';
+            return;
+        }
+
+        // Populate basic info
+        document.getElementById('user-role').textContent = user.role;
+        document.getElementById('nw-total').textContent = formatCurrency(user.netWorth);
+        document.getElementById('nw-assets').textContent = formatCurrency(user.assets);
+        document.getElementById('nw-liabs').textContent = formatCurrency(-user.liabilities);
+
+        // Populate tiles
+        document.getElementById('dash-pension').textContent = formatCurrency(user.pension.value);
+        document.getElementById('dash-pension-yield').textContent = `${user.pension.yield}% expected yield`;
+
+        const totalLoans = (user.mortgage.balance || 0) + (user.otherLoans.balance || 0);
+        document.getElementById('dash-mortgage').textContent = formatCurrency(-totalLoans);
+        document.getElementById('dash-mortgage-rate').textContent = user.mortgage.active ? `${user.mortgage.rate}% interest` : 'No active mortgage';
+
+        document.getElementById('dash-investments').textContent = formatCurrency(user.investing.balance);
+        document.getElementById('dash-invest-yield').textContent = `${user.investing.yield}% avg yield`;
+
+        document.getElementById('dash-pillar').textContent = formatCurrency(user.pillar3.balance);
+        document.getElementById('dash-pillar-tax').textContent = user.pillar3.active ? `Est. tax return: €${user.pillar3.taxBenefit}` : 'Not active';
+
+        // Action Center Logic
+        const actionCenter = document.getElementById('action-center');
+        let actionsHtml = '';
+        
+        if (user.mortgage.active && user.mortgage.rate > 3.5) {
+            actionsHtml += `
+                <div class="card card-alert">
+                    <div style="font-size: 1.5rem; margin-top: 2px;">💡</div>
+                    <div>
+                        <h4>Consider refinancing your mortgage</h4>
+                        <p class="text-muted" style="font-size: 0.9rem;">Your current rate is ${user.mortgage.rate}%. Market rates are lower. You could save up to €120/month.</p>
+                        <a href="mortgages.html" class="btn btn-outline mt-2" style="padding: 6px 16px;">View details</a>
+                    </div>
+                </div>`;
+        }
+        
+        if (!user.pillar3.active) {
+            actionsHtml += `
+                <div class="card card-alert">
+                    <div style="font-size: 1.5rem; margin-top: 2px;">⚡</div>
+                    <div>
+                        <h4>You are missing out on tax benefits</h4>
+                        <p class="text-muted" style="font-size: 0.9rem;">Opening a 3rd pillar pension could save you hundreds of euros in taxes yearly.</p>
+                        <a href="pillar-pensions.html" class="btn btn-outline mt-2" style="padding: 6px 16px;">Calculate benefit</a>
+                    </div>
+                </div>`;
+        }
+
+        if (user.investing.balance < 5000 && user.age < 35) {
+            actionsHtml += `
+                <div class="card card-alert">
+                    <div style="font-size: 1.5rem; margin-top: 2px;">🚀</div>
+                    <div>
+                        <h4>Start your investing journey</h4>
+                        <p class="text-muted" style="font-size: 0.9rem;">Compound interest is your best friend. A small monthly contribution goes a long way.</p>
+                        <a href="investing.html" class="btn btn-outline mt-2" style="padding: 6px 16px;">Explore profiles</a>
+                    </div>
+                </div>`;
+        }
+        
+        actionCenter.innerHTML = actionsHtml;
+
+        // Render Charts
+        const ctxAssets = document.getElementById('assetsChart').getContext('2d');
+        const assetLabels = ['Pension', '3rd Pillar', 'Investments'];
+        const assetData = [user.pension.value, user.pillar3.balance, user.investing.balance];
+        
+        if (user.childFund.active) {
+            assetLabels.push('Child Fund');
+            assetData.push(user.childFund.balance);
+        }
+        createDonutChart(ctxAssets, assetData, assetLabels, false);
+
+        // Simple projection (linear + compound mock)
+        const ctxProj = document.getElementById('projectionChart').getContext('2d');
+        const projLabels = ['Year 1', 'Year 3', 'Year 5', 'Year 7', 'Year 10'];
+        const base = user.assets;
+        const p1 = base * 1.05;
+        const p3 = base * 1.15;
+        const p5 = base * 1.28;
+        const p7 = base * 1.45;
+        const p10 = base * 1.70;
+        
+        createBarChart(ctxProj, [p1, p3, p5, p7, p10], projLabels, true);
+    });
+</script>
+
+</body>
+</html>

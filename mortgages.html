@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mortgages | Platform Sim</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--color-bg-alt);
+            padding-bottom: 10px;
+            overflow-x: auto;
+        }
+        .tab {
+            padding: 8px 16px;
+            border-radius: var(--border-radius-pill);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-family: var(--font-body);
+            font-weight: 600;
+            color: var(--color-text-muted);
+            white-space: nowrap;
+            transition: all var(--transition-speed);
+        }
+        .tab.active {
+            background: var(--color-brand);
+            color: var(--color-white);
+        }
+        .tab:hover:not(.active) {
+            background: var(--color-bg-alt);
+            color: var(--color-brand);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div id="sidebar-container"></div>
+
+    <main class="main-content">
+        <header class="page-header">
+            <div>
+                <h1 style="margin-bottom: 0;">Mortgage Optimization</h1>
+                <p class="text-muted">Manage your debt and find ways to pay less</p>
+            </div>
+            <div class="user-profile">
+                <div class="avatar"></div>
+                <div>
+                    <div class="user-name" style="font-weight: 600; font-size: 0.9rem;"></div>
+                    <div class="text-muted" style="font-size: 0.8rem;" id="user-role"></div>
+                </div>
+            </div>
+        </header>
+
+        <div id="no-mortgage" class="card text-center hidden">
+            <h2 class="mb-2">No Active Mortgage</h2>
+            <p class="text-muted mb-3">You do not currently have an active mortgage linked to your profile.</p>
+            <button class="btn btn-primary" onclick="alert('In a real app, this would open a form to manually add a mortgage or link a bank.')">Add Mortgage Manually</button>
+        </div>
+
+        <div id="has-mortgage" class="hidden">
+            <div class="grid-4 mb-3">
+                <div class="card card-dark" style="grid-column: span 2;">
+                    <p style="color: var(--color-bg-alt); text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; margin-bottom: 8px;">Remaining Balance</p>
+                    <h1 style="font-size: 2.5rem; margin-bottom: 0;" class="value-negative" id="mort-balance">€0.00</h1>
+                    <p class="mt-1" style="color: var(--color-bg-alt);">Original loan: <span id="mort-original">€0.00</span></p>
+                </div>
+                <div class="card">
+                    <p class="text-muted mb-1">Monthly Payment</p>
+                    <h3 id="mort-monthly">€0.00</h3>
+                </div>
+                <div class="card">
+                    <p class="text-muted mb-1">Current Interest Rate</p>
+                    <h3 id="mort-rate">0%</h3>
+                    <p class="text-muted mt-1" style="font-size: 0.8rem;" id="mort-term">0 years remaining</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="mb-3">Optimization Actions</h3>
+                
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('refinance')">💰 Refinance</button>
+                    <button class="tab" onclick="switchTab('increase')">⬆️ Increase Monthly</button>
+                    <button class="tab" onclick="switchTab('holiday')">⏸️ Credit Holiday</button>
+                    <button class="tab" onclick="switchTab('childbirth')">👶 Child Birth</button>
+                </div>
+
+                <div id="tab-refinance" class="tab-content active">
+                    <div class="grid-2">
+                        <div>
+                            <p class="text-muted mb-2">Market rates fluctuate. If you can secure a lower rate, refinancing could save you thousands over the loan term.</p>
+                            <label class="text-muted mb-1" style="display: block; font-size: 0.9rem;">Target New Rate (%)</label>
+                            <input type="number" id="refi-rate" value="3.5" step="0.1" style="padding: 10px; border-radius: 8px; border: 1px solid var(--color-bg-alt); width: 150px; margin-bottom: 20px;">
+                            <button class="btn btn-outline" onclick="calculateRefinance()">Calculate Savings</button>
+                        </div>
+                        <div class="card card-dark" style="margin-bottom: 0;">
+                            <p style="color: var(--color-bg-alt); font-size: 0.9rem;">Estimated Monthly Savings</p>
+                            <h2 id="refi-monthly-save" class="value-positive">€0.00</h2>
+                            <p style="color: var(--color-bg-alt); font-size: 0.9rem; margin-top: 1rem;">Total Interest Saved</p>
+                            <h3 id="refi-total-save" class="value-positive">€0.00</h3>
+                        </div>
+                    </div>
+                    <div class="mt-3" style="background: var(--color-bg); padding: 1rem; border-radius: 8px;">
+                        <h4 class="mb-1">How to refinance</h4>
+                        <ol style="margin-left: 20px; font-size: 0.9rem; color: var(--color-text-muted);">
+                            <li>Request a payoff quote from your current lender.</li>
+                            <li>Apply for a mortgage with a new lender showing your target rate.</li>
+                            <li>Pay attention to refinancing fees (usually 1-2% of loan balance).</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div id="tab-increase" class="tab-content">
+                    <div class="grid-2">
+                        <div>
+                            <p class="text-muted mb-2">Adding a little extra to your monthly payment goes directly to the principal, drastically reducing total interest.</p>
+                            <label class="text-muted mb-1" style="display: block; font-size: 0.9rem;">Extra Monthly Payment (€)</label>
+                            <input type="number" id="inc-extra" value="100" step="50" style="padding: 10px; border-radius: 8px; border: 1px solid var(--color-bg-alt); width: 150px; margin-bottom: 20px;">
+                            <button class="btn btn-outline" onclick="calculateIncrease()">Calculate Impact</button>
+                        </div>
+                        <div class="card card-dark" style="margin-bottom: 0;">
+                            <p style="color: var(--color-bg-alt); font-size: 0.9rem;">Years Saved</p>
+                            <h2 id="inc-years-save" class="value-positive">0 years</h2>
+                            <p style="color: var(--color-bg-alt); font-size: 0.9rem; margin-top: 1rem;">Total Interest Saved</p>
+                            <h3 id="inc-total-save" class="value-positive">€0.00</h3>
+                        </div>
+                    </div>
+                    <div class="mt-3" style="background: var(--color-bg); padding: 1rem; border-radius: 8px;">
+                        <h4 class="mb-1">How to increase payment</h4>
+                        <ol style="margin-left: 20px; font-size: 0.9rem; color: var(--color-text-muted);">
+                            <li>Log in to your bank's portal.</li>
+                            <li>Go to Loan details > Repayment schedule.</li>
+                            <li>Select "Make extra payment" or "Change monthly amount".</li>
+                            <li>Ensure the extra amount is applied to principal, not future interest.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div id="tab-holiday" class="tab-content">
+                    <div class="grid-2">
+                        <div>
+                            <h4 class="mb-1" style="color: var(--color-positive);">Eligibility: Approved ✅</h4>
+                            <p class="text-muted mb-2">You can request a pause on principal payments for up to 6 months. Note: You will still pay interest during this time.</p>
+                            <button class="btn btn-outline">Apply via eVerify</button>
+                        </div>
+                        <div class="card card-alert" style="margin-bottom: 0;">
+                            <div>
+                                <h4 style="color: var(--color-brand-dark);">Cost Warning</h4>
+                                <p style="font-size: 0.9rem; color: var(--color-brand-dark);">Taking a 6-month holiday will increase your total loan cost by approximately <b id="holiday-cost">€0.00</b> due to capitalized interest.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-childbirth" class="tab-content">
+                    <div class="grid-2">
+                        <div>
+                            <p class="text-muted mb-2">Most EU banks allow a 1-year mortgage payment pause (principal) upon the birth of a child without penalty fees.</p>
+                            <button class="btn btn-primary">Start Application</button>
+                        </div>
+                        <div class="card" style="background: #F0E8F5; margin-bottom: 0;">
+                            <h4>Required Documents</h4>
+                            <ul style="margin-left: 20px; font-size: 0.9rem; color: var(--color-brand-dark); margin-top: 10px;">
+                                <li>Child's birth certificate</li>
+                                <li>ID of borrower</li>
+                                <li>Signed bank request form</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/nav.js"></script>
+<script>
+    let currentUser = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+        currentUser = getPersona();
+        if (!currentUser) {
+            window.location.href = 'index.html';
+            return;
+        }
+
+        if (currentUser.mortgage.active) {
+            document.getElementById('has-mortgage').classList.remove('hidden');
+            document.getElementById('mort-balance').textContent = formatCurrency(-currentUser.mortgage.balance);
+            document.getElementById('mort-original').textContent = formatCurrency(currentUser.mortgage.original);
+            document.getElementById('mort-monthly').textContent = formatCurrency(currentUser.mortgage.monthly);
+            document.getElementById('mort-rate').textContent = `${currentUser.mortgage.rate}%`;
+            document.getElementById('mort-term').textContent = `${currentUser.mortgage.termRemaining} years remaining`;
+            
+            calculateRefinance();
+            calculateIncrease();
+            
+            // Mock holiday cost (6 months of interest)
+            const monthlyInterest = (currentUser.mortgage.balance * (currentUser.mortgage.rate / 100)) / 12;
+            document.getElementById('holiday-cost').textContent = formatCurrency(monthlyInterest * 6);
+        } else {
+            document.getElementById('no-mortgage').classList.remove('hidden');
+        }
+    });
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        event.target.classList.add('active');
+        document.getElementById(`tab-${tabId}`).classList.add('active');
+    }
+
+    // Basic mock calculations for demonstration
+    function calculateRefinance() {
+        if (!currentUser || !currentUser.mortgage.active) return;
+        const newRate = parseFloat(document.getElementById('refi-rate').value);
+        if (isNaN(newRate)) return;
+        
+        const oldRate = currentUser.mortgage.rate;
+        if (newRate >= oldRate) {
+            document.getElementById('refi-monthly-save').textContent = '€0.00';
+            document.getElementById('refi-total-save').textContent = '€0.00';
+            return;
+        }
+        
+        // Very simplified mock math
+        const rateDiff = (oldRate - newRate) / 100;
+        const yearlySavings = currentUser.mortgage.balance * rateDiff;
+        const monthlySavings = yearlySavings / 12;
+        const totalSavings = yearlySavings * currentUser.mortgage.termRemaining;
+        
+        document.getElementById('refi-monthly-save').textContent = formatCurrency(monthlySavings);
+        document.getElementById('refi-total-save').textContent = formatCurrency(totalSavings);
+    }
+
+    function calculateIncrease() {
+        if (!currentUser || !currentUser.mortgage.active) return;
+        const extra = parseFloat(document.getElementById('inc-extra').value);
+        if (isNaN(extra) || extra <= 0) return;
+        
+        // Mock math: Assume 100 extra saves ~0.5 years per 10k balance
+        const baseImpact = extra / 100;
+        const factor = currentUser.mortgage.balance / 50000;
+        const yearsSaved = Math.min(currentUser.mortgage.termRemaining - 1, baseImpact * factor);
+        
+        const interestSaved = yearsSaved * 12 * (currentUser.mortgage.monthly * 0.4); // rough mock
+        
+        document.getElementById('inc-years-save').textContent = `${yearsSaved.toFixed(1)} years`;
+        document.getElementById('inc-total-save').textContent = formatCurrency(interestSaved);
+    }
+</script>
+
+</body>
+</html>

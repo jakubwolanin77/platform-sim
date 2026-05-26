@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pensions | Platform Sim</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .strategy-card {
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+        }
+        .strategy-card.selected {
+            border-color: var(--color-brand);
+            background-color: var(--color-brand-light);
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div id="sidebar-container"></div>
+
+    <main class="main-content">
+        <header class="page-header">
+            <div>
+                <h1 style="margin-bottom: 0;">State & 2nd Pillar Pension</h1>
+                <p class="text-muted">Manage your primary retirement funds</p>
+            </div>
+            <div class="user-profile">
+                <div class="avatar"></div>
+                <div>
+                    <div class="user-name" style="font-weight: 600; font-size: 0.9rem;"></div>
+                    <div class="text-muted" style="font-size: 0.8rem;" id="user-role"></div>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid-2 mb-3">
+            <div class="card card-dark flex-between">
+                <div>
+                    <p style="color: var(--color-bg-alt); text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; margin-bottom: 8px;">Current Balance</p>
+                    <h1 style="font-size: 2.5rem; margin-bottom: 0;" id="pension-balance">€0.00</h1>
+                    <p class="mt-1" style="color: var(--color-positive);" id="pension-yield">+0% avg. historical yield</p>
+                </div>
+                <div style="text-align: right;">
+                    <p style="color: var(--color-bg-alt); text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; margin-bottom: 8px;">Provider</p>
+                    <h3 id="pension-provider">Provider</h3>
+                    <p class="mt-1" style="color: var(--color-bg-alt);" id="pension-plan">Plan</p>
+                </div>
+            </div>
+            
+            <div class="card card-alert" style="align-items: center; justify-content: center; text-align: center; display: flex; flex-direction: column;">
+                <h3 style="color: var(--color-brand-dark);">Liquidity Info</h3>
+                <p class="text-muted mb-2">State pensions cannot be liquidated before official retirement age. Some 2nd pillar plans allow early withdrawal with penalties.</p>
+                <button class="btn btn-primary" onclick="alert('In a real app, this would open a detailed document regarding local pension laws.')">View Liquidity Rules</button>
+            </div>
+        </div>
+
+        <h3>Plan Strategy Simulator</h3>
+        <p class="text-muted mb-2">Select a different strategy to see how it affects your projected retirement value.</p>
+        
+        <div class="grid-3 mb-3">
+            <div class="card strategy-card" id="strat-conservative" onclick="selectStrategy('conservative', 2.5)">
+                <h4>Conservative</h4>
+                <p class="text-muted" style="font-size: 0.9rem;">Low risk, mostly bonds.</p>
+                <p class="value-positive mt-1">~2.5% yield</p>
+            </div>
+            <div class="card strategy-card" id="strat-balanced" onclick="selectStrategy('balanced', 4.5)">
+                <h4>Balanced</h4>
+                <p class="text-muted" style="font-size: 0.9rem;">Mix of stocks and bonds.</p>
+                <p class="value-positive mt-1">~4.5% yield</p>
+            </div>
+            <div class="card strategy-card" id="strat-growth" onclick="selectStrategy('growth', 7.0)">
+                <h4>Growth</h4>
+                <p class="text-muted" style="font-size: 0.9rem;">High risk, mostly equities.</p>
+                <p class="value-positive mt-1">~7.0% yield</p>
+            </div>
+        </div>
+
+        <div class="card card-dark mb-3">
+            <div class="flex-between mb-2">
+                <h3>Projected Value at Age 65</h3>
+                <h2 id="projected-value" class="value-positive" style="color: var(--color-positive) !important;">€0.00</h2>
+            </div>
+            <div class="chart-container">
+                <canvas id="retirementChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>How to change your plan</h3>
+            <ol style="margin-left: 20px; margin-top: 10px; color: var(--color-text-muted); line-height: 1.8;">
+                <li>Log in to your current provider's portal (e.g. Swedbank, SEB, Luminor).</li>
+                <li>Navigate to the "Pensions" section.</li>
+                <li>Select "Change Pension Plan".</li>
+                <li>Choose your desired new plan and sign with eVerify/Smart-ID.</li>
+                <li>The change usually takes effect within a few business days.</li>
+            </ol>
+            <div class="mt-2 text-center">
+                <button class="btn btn-outline" onclick="alert('This would trigger a redirect to the provider portal.')">Go to Provider Portal</button>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/nav.js"></script>
+<script>
+    let chartInstance = null;
+    let currentUser = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+        currentUser = getPersona();
+        if (!currentUser) {
+            window.location.href = 'index.html';
+            return;
+        }
+
+        // Populate Top Cards
+        document.getElementById('pension-balance').textContent = formatCurrency(currentUser.pension.value);
+        document.getElementById('pension-yield').textContent = `+${currentUser.pension.yield}% avg. historical yield`;
+        document.getElementById('pension-provider').textContent = currentUser.pension.provider;
+        document.getElementById('pension-plan').textContent = currentUser.pension.plan;
+
+        // Determine current strategy based on yield
+        let defaultStrat = 'balanced';
+        if (currentUser.pension.yield < 3.5) defaultStrat = 'conservative';
+        if (currentUser.pension.yield > 6.0) defaultStrat = 'growth';
+        
+        selectStrategy(defaultStrat, currentUser.pension.yield);
+    });
+
+    function selectStrategy(stratId, yieldRate) {
+        document.querySelectorAll('.strategy-card').forEach(el => el.classList.remove('selected'));
+        document.getElementById(`strat-${stratId}`).classList.add('selected');
+        
+        updateProjection(yieldRate);
+    }
+
+    function updateProjection(yieldRate) {
+        if (!currentUser) return;
+        
+        const currentAge = currentUser.age;
+        const yearsToRetirement = Math.max(1, 65 - currentAge);
+        
+        let labels = [];
+        let data = [];
+        
+        let balance = currentUser.pension.value;
+        const mockMonthlyContrib = 200; // Mock contribution
+        
+        for (let i = 0; i <= yearsToRetirement; i+= (yearsToRetirement > 20 ? 5 : 2)) {
+            labels.push(`Age ${currentAge + i}`);
+            const projected = compoundInterest(currentUser.pension.value, mockMonthlyContrib, yieldRate, i);
+            data.push(projected);
+        }
+        
+        const finalValue = data[data.length - 1];
+        document.getElementById('projected-value').textContent = formatCurrency(finalValue);
+
+        const ctx = document.getElementById('retirementChart').getContext('2d');
+        
+        if (chartInstance) {
+            chartInstance.destroy();
+        }
+        
+        chartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Projected Pension',
+                    data: data,
+                    borderColor: chartColors.positive,
+                    backgroundColor: 'rgba(82, 173, 140, 0.2)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                ...defaultOptions,
+                scales: {
+                    y: {
+                        grid: { color: 'rgba(255,255,255,0.1)' },
+                        ticks: { color: '#FFF' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#FFF' }
+                    }
+                },
+                plugins: {
+                    ...defaultOptions.plugins,
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

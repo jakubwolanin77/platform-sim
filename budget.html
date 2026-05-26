@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budgeting | Platform Sim</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Budgeting specific styles - slightly different feel as it's a side app */
+        body { background-color: var(--color-white); }
+        .budget-header {
+            background-color: var(--color-brand-dark);
+            color: white;
+            padding: 2rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .budget-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+    </style>
+</head>
+<body>
+
+<header class="budget-header">
+    <div class="logo" style="color: white; margin-bottom: 0;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="white"/>
+            <path d="M2 17L12 22L22 17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 12L12 17L22 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Budget<span style="color: var(--color-accent-coral);">App</span>
+    </div>
+    <div style="display: flex; gap: 15px; align-items: center;">
+        <span id="user-name" style="font-weight: 600;"></span>
+        <a href="dashboard.html" class="btn btn-outline" style="border-color: white; color: white;">Back to Platform</a>
+    </div>
+</header>
+
+<div class="budget-container">
+    <div class="card card-alert mb-3" style="background: var(--color-bg-alt); align-items: center;">
+        <div style="font-size: 1.5rem;">🚧</div>
+        <div>
+            <h4 style="color: var(--color-brand-dark);">Standalone App Preview</h4>
+            <p class="text-muted">This is a preview of the standalone budgeting application that connects to the main platform ecosystem.</p>
+        </div>
+    </div>
+
+    <div class="grid-3 mb-3">
+        <div class="card card-dark" style="grid-column: span 2;">
+            <p style="color: var(--color-bg-alt); text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; margin-bottom: 8px;">Left to Spend (This Month)</p>
+            <h1 style="font-size: 3rem; margin-bottom: 0;" class="value-positive">€840.20</h1>
+            <div class="mt-2" style="background: rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; display: flex; justify-content: space-between;">
+                <span>Income: €2,400.00</span>
+                <span>Spent: €1,559.80</span>
+            </div>
+        </div>
+        <div class="card text-center" style="display: flex; flex-direction: column; justify-content: center;">
+            <p class="text-muted mb-1">Savings Rate</p>
+            <h2 style="color: var(--color-positive);">24%</h2>
+            <p class="text-muted mt-2" style="font-size: 0.85rem;">Target: 20% ✅</p>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="card">
+            <h3 class="mb-2">Spending Breakdown</h3>
+            <div class="chart-container" style="height: 250px;">
+                <canvas id="budgetDonut"></canvas>
+            </div>
+        </div>
+        <div class="card">
+            <h3 class="mb-2">Recent Transactions</h3>
+            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--color-bg-alt);">
+                <div>
+                    <p style="font-weight: 600;">Rimi Supermarket</p>
+                    <p class="text-muted" style="font-size: 0.85rem;">Groceries • Today</p>
+                </div>
+                <p class="value-negative">-€42.50</p>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--color-bg-alt);">
+                <div>
+                    <p style="font-weight: 600;">Neste Gas Station</p>
+                    <p class="text-muted" style="font-size: 0.85rem;">Transport • Yesterday</p>
+                </div>
+                <p class="value-negative">-€55.00</p>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--color-bg-alt);">
+                <div>
+                    <p style="font-weight: 600;">Indexa Auto-Invest</p>
+                    <p class="text-muted" style="font-size: 0.85rem;">Investments • May 1st</p>
+                </div>
+                <p class="value-negative">-€300.00</p>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 10px 0;">
+                <div>
+                    <p style="font-weight: 600;">Salary</p>
+                    <p class="text-muted" style="font-size: 0.85rem;">Income • May 1st</p>
+                </div>
+                <p class="value-positive">+€2,400.00</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/charts.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const user = getPersona();
+        if (user) {
+            document.getElementById('user-name').textContent = user.name;
+        }
+
+        const ctx = document.getElementById('budgetDonut').getContext('2d');
+        createDonutChart(ctx, [45, 20, 15, 10, 10], ['Housing', 'Groceries', 'Transport', 'Utilities', 'Entertainment']);
+    });
+</script>
+
+</body>
+</html>

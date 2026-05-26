@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Child Funds | Platform Sim</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="app-container">
+    <div id="sidebar-container"></div>
+
+    <main class="main-content">
+        <header class="page-header">
+            <div>
+                <h1 style="margin-bottom: 0;">Child Funds</h1>
+                <p class="text-muted">Invest for your children's future</p>
+            </div>
+            <div class="user-profile">
+                <div class="avatar"></div>
+                <div>
+                    <div class="user-name" style="font-weight: 600; font-size: 0.9rem;"></div>
+                    <div class="text-muted" style="font-size: 0.8rem;" id="user-role"></div>
+                </div>
+            </div>
+        </header>
+
+        <div id="no-fund" class="hidden">
+            <div class="card card-dark" style="text-align: center; padding: 3rem;">
+                <h2>Should you create a child fund?</h2>
+                <p style="color: var(--color-bg-alt); max-width: 600px; margin: 1rem auto 2rem;">If you have children, time is your greatest asset. Investing just €50 a month from birth can result in over €20,000 by their 18th birthday thanks to compound interest.</p>
+                <div class="grid-2" style="text-align: left; max-width: 600px; margin: 0 auto; background: var(--color-brand); padding: 1.5rem; border-radius: var(--border-radius-card);">
+                    <div>
+                        <label style="color: var(--color-bg-alt); font-size: 0.9rem;">Child Age</label>
+                        <input type="number" id="sim-age" value="0" min="0" max="17" class="login-input mt-1" onchange="simulateFund()">
+                    </div>
+                    <div>
+                        <label style="color: var(--color-bg-alt); font-size: 0.9rem;">Monthly Contrib. (€)</label>
+                        <input type="number" id="sim-monthly" value="50" step="10" class="login-input mt-1" onchange="simulateFund()">
+                    </div>
+                </div>
+                <h3 class="mt-3" style="color: var(--color-positive);">Projected at age 18: <span id="sim-result">€0.00</span></h3>
+                <button class="btn btn-primary mt-3">Start a Fund</button>
+            </div>
+            
+            <div class="card mt-3">
+                <h3>How to set it up</h3>
+                <div class="grid-3 mt-2">
+                    <div style="background: var(--color-bg-alt); padding: 1rem; border-radius: 8px;">
+                        <h4 style="color: var(--color-brand);">1. Choose Account</h4>
+                        <p class="text-muted" style="font-size: 0.9rem;">Decide between a custodial account (belongs to child) or investing in your own name earmarked for them.</p>
+                    </div>
+                    <div style="background: var(--color-bg-alt); padding: 1rem; border-radius: 8px;">
+                        <h4 style="color: var(--color-brand);">2. Select Index Fund</h4>
+                        <p class="text-muted" style="font-size: 0.9rem;">Pick a low-cost global index fund. Time horizon is 10+ years, so 100% equity is standard.</p>
+                    </div>
+                    <div style="background: var(--color-bg-alt); padding: 1rem; border-radius: 8px;">
+                        <h4 style="color: var(--color-brand);">3. Automate</h4>
+                        <p class="text-muted" style="font-size: 0.9rem;">Set up an automatic monthly transfer on payday. Set it and forget it.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="has-fund" class="hidden">
+            <div class="grid-3 mb-3">
+                <div class="card card-dark" style="grid-column: span 2;">
+                    <p style="color: var(--color-bg-alt); text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; margin-bottom: 8px;">Current Balance</p>
+                    <h1 style="font-size: 2.5rem; margin-bottom: 0;" class="value-positive" id="fund-balance">€0.00</h1>
+                    <p class="mt-1" style="color: var(--color-bg-alt);">Child Age: <span id="fund-age">0</span></p>
+                </div>
+                <div class="card">
+                    <p class="text-muted mb-1">Monthly Contribution</p>
+                    <h3 id="fund-monthly">€0.00</h3>
+                    <button class="btn btn-outline mt-2" style="width: 100%;">Adjust</button>
+                </div>
+            </div>
+
+            <div class="card card-dark mb-3">
+                <div class="flex-between mb-2">
+                    <h3>Projection to Age 18</h3>
+                    <h2 id="fund-target" class="value-positive">€0.00</h2>
+                </div>
+                <div class="chart-container">
+                    <canvas id="childChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/nav.js"></script>
+<script>
+    let currentUser = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+        currentUser = getPersona();
+        if (!currentUser) {
+            window.location.href = 'index.html';
+            return;
+        }
+
+        if (currentUser.childFund.active) {
+            document.getElementById('has-fund').classList.remove('hidden');
+            document.getElementById('fund-balance').textContent = formatCurrency(currentUser.childFund.balance);
+            document.getElementById('fund-age').textContent = currentUser.childFund.childAge;
+            document.getElementById('fund-monthly').textContent = formatCurrency(currentUser.childFund.monthlyContribution);
+            
+            renderChart();
+        } else {
+            document.getElementById('no-fund').classList.remove('hidden');
+            simulateFund();
+        }
+    });
+
+    function simulateFund() {
+        const age = parseInt(document.getElementById('sim-age').value) || 0;
+        const monthly = parseFloat(document.getElementById('sim-monthly').value) || 0;
+        
+        const years = Math.max(0, 18 - age);
+        const result = compoundInterest(0, monthly, 7.0, years);
+        
+        document.getElementById('sim-result').textContent = formatCurrency(result);
+    }
+
+    function renderChart() {
+        const ctx = document.getElementById('childChart').getContext('2d');
+        const currentAge = currentUser.childFund.childAge;
+        const yearsLeft = Math.max(1, 18 - currentAge);
+        
+        let labels = [];
+        let data = [];
+        
+        for(let i=0; i<=yearsLeft; i++) {
+            labels.push(`Age ${currentAge + i}`);
+            data.push(compoundInterest(currentUser.childFund.balance, currentUser.childFund.monthlyContribution, 7.0, i));
+        }
+        
+        document.getElementById('fund-target').textContent = formatCurrency(data[data.length-1]);
+        
+        createBarChart(ctx, data, labels, true);
+    }
+</script>
+
+</body>
+</html>

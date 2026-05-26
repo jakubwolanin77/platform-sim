@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3rd & 4th Pillar | Platform Sim</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="app-container">
+    <div id="sidebar-container"></div>
+
+    <main class="main-content">
+        <header class="page-header">
+            <div>
+                <h1 style="margin-bottom: 0;">3rd & 4th Pillar Pensions</h1>
+                <p class="text-muted">Private pension funds with tax benefits</p>
+            </div>
+            <div class="user-profile">
+                <div class="avatar"></div>
+                <div>
+                    <div class="user-name" style="font-weight: 600; font-size: 0.9rem;"></div>
+                    <div class="text-muted" style="font-size: 0.8rem;" id="user-role"></div>
+                </div>
+            </div>
+        </header>
+
+        <div id="no-pillar" class="hidden">
+            <div class="card card-dark flex-between mb-3" style="padding: 2rem;">
+                <div style="max-width: 600px;">
+                    <h2 class="mb-2">You don't have a 3rd Pillar yet. Is it worth it?</h2>
+                    <p style="color: var(--color-bg-alt); font-size: 1.1rem; line-height: 1.6;">In most EU countries, contributing to a 3rd pillar pension gives you a <b>20% income tax return</b> on contributions (up to a limit). It's literally free money from the government.</p>
+                </div>
+                <div style="text-align: right;">
+                    <p style="color: var(--color-bg-alt); text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; margin-bottom: 8px;">Potential Annual Return</p>
+                    <h1 style="font-size: 3rem; margin-bottom: 0; color: var(--color-positive);" id="pot-tax">€0.00</h1>
+                </div>
+            </div>
+
+            <div class="grid-2 mb-3">
+                <div class="card">
+                    <h3>Calculate your benefit</h3>
+                    <p class="text-muted mb-2">See how much tax you get back next year.</p>
+                    <label class="text-muted mb-1" style="display: block; font-size: 0.9rem;">Monthly Contribution (€)</label>
+                    <input type="number" id="calc-contrib" value="100" step="50" style="padding: 10px; border-radius: 8px; border: 1px solid var(--color-bg-alt); width: 100%; margin-bottom: 20px;">
+                    <button class="btn btn-primary" style="width: 100%;" onclick="calcTaxBenefit()">Calculate</button>
+                    
+                    <div class="mt-3 p-2" style="background: var(--color-bg); border-radius: 8px; text-align: center; padding: 1rem;">
+                        <p class="text-muted mb-1">Your tax return next spring:</p>
+                        <h2 id="calc-result" class="value-positive">€240.00</h2>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>How to set one up</h3>
+                    <ol style="margin-left: 20px; margin-top: 10px; color: var(--color-text-muted); line-height: 1.8;">
+                        <li>Compare providers below (fees and historical returns).</li>
+                        <li>Click "Open Account" on your chosen provider.</li>
+                        <li>Sign the contract via eVerify.</li>
+                        <li>Set up an automatic monthly standing order from your main bank.</li>
+                        <li>Declare it in your annual income tax return to get the 20% back.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <h3 class="mb-2">Compare Providers</h3>
+            <div style="background: var(--color-white); border-radius: var(--border-radius-card); box-shadow: var(--shadow-card); overflow: hidden;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <tr style="background: var(--color-bg-alt); color: var(--color-brand-dark);">
+                        <th style="padding: 16px;">Provider</th>
+                        <th style="padding: 16px;">Fund Name</th>
+                        <th style="padding: 16px;">Risk Level</th>
+                        <th style="padding: 16px;">Mgmt Fee</th>
+                        <th style="padding: 16px;">Action</th>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--color-bg-alt);">
+                        <td style="padding: 16px; font-weight: 600;">Indexa</td>
+                        <td style="padding: 16px;">Global Equity 3rd</td>
+                        <td style="padding: 16px;">High</td>
+                        <td style="padding: 16px;">0.39%</td>
+                        <td style="padding: 16px;"><button class="btn btn-outline" style="padding: 6px 16px; font-size: 0.8rem;">Open</button></td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--color-bg-alt);">
+                        <td style="padding: 16px; font-weight: 600;">Swedbank</td>
+                        <td style="padding: 16px;">Index 100</td>
+                        <td style="padding: 16px;">High</td>
+                        <td style="padding: 16px;">0.50%</td>
+                        <td style="padding: 16px;"><button class="btn btn-outline" style="padding: 6px 16px; font-size: 0.8rem;">Open</button></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 16px; font-weight: 600;">SEB</td>
+                        <td style="padding: 16px;">Active Balanced</td>
+                        <td style="padding: 16px;">Medium</td>
+                        <td style="padding: 16px;">1.10%</td>
+                        <td style="padding: 16px;"><button class="btn btn-outline" style="padding: 6px 16px; font-size: 0.8rem;">Open</button></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div id="has-pillar" class="hidden">
+            <div class="grid-3 mb-3">
+                <div class="card card-dark" style="grid-column: span 2;">
+                    <p style="color: var(--color-bg-alt); text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; margin-bottom: 8px;">Total Balance</p>
+                    <h1 style="font-size: 2.5rem; margin-bottom: 0;" class="value-positive" id="pil-balance">€0.00</h1>
+                </div>
+                <div class="card card-alert">
+                    <div>
+                        <h3 style="color: var(--color-brand-dark);">Tax Return</h3>
+                        <p class="text-muted mb-2">Estimated return for this year</p>
+                        <h2 id="pil-tax" class="value-positive">€0.00</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <h3>Monthly Contribution</h3>
+                <div class="flex-between mt-2" style="background: var(--color-bg-alt); padding: 1rem; border-radius: 8px;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div style="width: 40px; height: 40px; background: var(--color-brand); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;">🔄</div>
+                        <div>
+                            <p style="font-weight: 600;" id="pil-monthly">€0.00 / month</p>
+                            <p class="text-muted" style="font-size: 0.85rem;">Auto-transfer active</p>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline">Edit Amount</button>
+                </div>
+            </div>
+            
+            <div class="card card-dark">
+                <div class="flex-between mb-2">
+                    <h3>Projected Growth</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="pillarChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/nav.js"></script>
+<script>
+    let currentUser = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+        currentUser = getPersona();
+        if (!currentUser) {
+            window.location.href = 'index.html';
+            return;
+        }
+
+        if (currentUser.pillar3.active) {
+            document.getElementById('has-pillar').classList.remove('hidden');
+            document.getElementById('pil-balance').textContent = formatCurrency(currentUser.pillar3.balance);
+            document.getElementById('pil-tax').textContent = formatCurrency(currentUser.pillar3.taxBenefit);
+            document.getElementById('pil-monthly').textContent = formatCurrency(currentUser.pillar3.monthlyContribution) + " / month";
+            
+            renderChart();
+        } else {
+            document.getElementById('no-pillar').classList.remove('hidden');
+            calcTaxBenefit();
+        }
+    });
+
+    function calcTaxBenefit() {
+        const input = document.getElementById('calc-contrib');
+        let monthly = 100;
+        if (input) monthly = parseFloat(input.value) || 0;
+        
+        const yearly = monthly * 12;
+        const taxBenefit = yearly * 0.20; // 20% mock tax rate
+        
+        const resEl = document.getElementById('calc-result');
+        if (resEl) resEl.textContent = formatCurrency(taxBenefit);
+        
+        const potEl = document.getElementById('pot-tax');
+        if (potEl) potEl.textContent = formatCurrency(taxBenefit);
+    }
+
+    function renderChart() {
+        const ctx = document.getElementById('pillarChart').getContext('2d');
+        const labels = ['Now', 'Year 5', 'Year 10', 'Year 15', 'Year 20'];
+        let data = [];
+        
+        let bal = currentUser.pillar3.balance;
+        const monthly = currentUser.pillar3.monthlyContribution;
+        
+        for(let i=0; i<=20; i+=5) {
+            data.push(compoundInterest(bal, monthly, 6.0, i)); // 6% yield mock
+        }
+        
+        createBarChart(ctx, data, labels, true);
+    }
+</script>
+
+</body>
+</html>
