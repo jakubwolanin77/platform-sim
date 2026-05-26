@@ -94,6 +94,7 @@
                     <button class="tab" onclick="switchTab('increase')">⬆️ Increase Monthly</button>
                     <button class="tab" onclick="switchTab('holiday')">⏸️ Credit Holiday</button>
                     <button class="tab" onclick="switchTab('childbirth')">👶 Child Birth</button>
+                    <button class="tab" onclick="switchTab('findloan')" style="color: var(--color-positive);">🔍 Find a Loan</button>
                 </div>
 
                 <div id="tab-refinance" class="tab-content active">
@@ -177,6 +178,40 @@
                                 <li>Signed bank request form</li>
                             </ul>
                         </div>
+                    </div>
+                </div>
+
+                <div id="tab-findloan" class="tab-content">
+                    <h3 class="mb-2">Top Mortgage Picks</h3>
+                    <p class="text-muted mb-3">Based on your profile, these are the best current offers on the market.</p>
+                    
+                    <div style="background: var(--color-white); border-radius: var(--border-radius-card); border: 1px solid var(--color-bg-alt); overflow: hidden;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                            <tr style="background: var(--color-bg-alt); color: var(--color-brand-dark);">
+                                <th style="padding: 16px;">Provider</th>
+                                <th style="padding: 16px;">Type</th>
+                                <th style="padding: 16px;">Interest Rate</th>
+                                <th style="padding: 16px;">Action</th>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--color-bg-alt);">
+                                <td style="padding: 16px; font-weight: 600;">Luminor</td>
+                                <td style="padding: 16px;">Fixed (5 years)</td>
+                                <td style="padding: 16px; color: var(--color-positive); font-weight: bold;">3.2%</td>
+                                <td style="padding: 16px;"><button class="btn btn-primary" style="padding: 6px 16px; font-size: 0.8rem;">Apply Now</button></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--color-bg-alt);">
+                                <td style="padding: 16px; font-weight: 600;">Citadele</td>
+                                <td style="padding: 16px;">Variable (EURIBOR)</td>
+                                <td style="padding: 16px; font-weight: bold;">3.5% + 6m</td>
+                                <td style="padding: 16px;"><button class="btn btn-outline" style="padding: 6px 16px; font-size: 0.8rem;">Apply Now</button></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 16px; font-weight: 600;">Swedbank</td>
+                                <td style="padding: 16px;">Green Mortgage</td>
+                                <td style="padding: 16px; font-weight: bold;">3.8%</td>
+                                <td style="padding: 16px;"><button class="btn btn-outline" style="padding: 6px 16px; font-size: 0.8rem;">Apply Now</button></td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
 

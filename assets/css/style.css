@@ -68,6 +68,8 @@ a:hover {
 .app-container {
     display: flex;
     min-height: 100vh;
+    max-width: 1500px;
+    margin: 0 auto;
 }
 
 /* Sidebar Navigation */
@@ -78,7 +80,8 @@ a:hover {
     padding: 2rem 1.5rem;
     display: flex;
     flex-direction: column;
-    position: fixed;
+    position: sticky;
+    top: 0;
     height: 100vh;
     overflow-y: auto;
     z-index: 10;
@@ -145,7 +148,6 @@ a:hover {
 /* Main Content Area */
 .main-content {
     flex-grow: 1;
-    margin-left: 280px;
     padding: 2.5rem 3rem;
     max-width: 1200px;
 }
@@ -387,3 +389,75 @@ a:hover {
 
 /* Hide elements initially */
 .hidden { display: none !important; }
+
+/* Mobile and Tablet Responsiveness */
+@media (max-width: 900px) {
+    .app-container {
+        display: block;
+    }
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        top: auto;
+        border-right: none;
+        border-top: 1px solid rgba(74, 27, 109, 0.1);
+        padding: 10px;
+        flex-direction: row;
+        z-index: 100;
+        align-items: center;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+    }
+    .sidebar .logo {
+        display: none;
+    }
+    .nav-links {
+        flex-direction: row;
+        overflow-x: auto;
+        gap: 8px;
+        margin-bottom: 0;
+        padding-bottom: 5px;
+    }
+    .nav-links::-webkit-scrollbar {
+        display: none;
+    }
+    .nav-links a {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+    .nav-budget-btn {
+        margin-top: 0;
+    }
+    .main-content {
+        margin-left: 0;
+        padding: 1.5rem 1rem;
+        margin-bottom: 80px; /* space for bottom nav */
+    }
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    .grid-2, .grid-3, .grid-4 {
+        grid-template-columns: 1fr;
+    }
+    .net-worth-badge {
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-between;
+    }
+    .flex-between {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    .flex-between > div {
+        width: 100%;
+    }
+    .login-card {
+        padding: 2rem 1.5rem;
+    }
+}

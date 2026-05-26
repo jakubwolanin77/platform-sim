@@ -31,7 +31,10 @@
         <div class="card card-dark flex-between" style="padding: 2rem;">
             <div>
                 <p style="color: var(--color-bg-alt); text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; margin-bottom: 8px;">Total Net Worth</p>
-                <h1 style="font-size: 3rem; margin-bottom: 0;" id="nw-total">€0.00</h1>
+                <div style="display: flex; align-items: baseline; gap: 15px; margin-bottom: 0;">
+                    <h1 style="font-size: 3rem; margin-bottom: 0;" id="nw-total">€0.00</h1>
+                    <span id="fin-score-badge" style="background: var(--color-brand); padding: 6px 14px; border-radius: 20px; font-size: 1rem; font-weight: bold; border: 1px solid rgba(255,255,255,0.2);">Score: 0</span>
+                </div>
             </div>
             <div class="net-worth-badge">
                 <div class="nw-part nw-assets">
@@ -162,6 +165,28 @@
                         <a href="investing.html" class="btn btn-outline mt-2" style="padding: 6px 16px;">Explore profiles</a>
                     </div>
                 </div>`;
+        }
+        
+        // Score Logic
+        const score = calculateScore(user);
+        const scoreBadge = document.getElementById('fin-score-badge');
+        scoreBadge.textContent = `Score: ${score}`;
+        
+        let scoreColor = 'var(--color-positive)';
+        if (score < 500) scoreColor = 'var(--color-accent-coral)';
+        else if (score < 750) scoreColor = 'var(--color-accent-yellow)';
+        scoreBadge.style.color = scoreColor;
+        
+        if (score < 500) {
+            actionsHtml = `
+                <div class="card card-alert" style="background-color: rgba(236, 143, 107, 0.2);">
+                    <div style="font-size: 1.5rem; margin-top: 2px;">⚠️</div>
+                    <div>
+                        <h4>Your Financial Score is Low</h4>
+                        <p class="text-muted" style="font-size: 0.9rem;">You have more liabilities than assets. High debt means high interest payments eating away your wealth. Focus on optimizing your loans to get out of the red.</p>
+                        <a href="mortgages.html" class="btn btn-outline mt-2" style="padding: 6px 16px;">Optimize Debt</a>
+                    </div>
+                </div>` + actionsHtml;
         }
         
         actionCenter.innerHTML = actionsHtml;

@@ -170,6 +170,13 @@ function compoundInterest(principal, monthly, rate, years) {
     return balance;
 }
 
+function calculateScore(user) {
+    const total = user.assets + user.liabilities;
+    if (total === 0) return 500;
+    const score = Math.round((user.assets / total) * 1000);
+    return score;
+}
+
 // On Load: Populate Profile Info
 document.addEventListener("DOMContentLoaded", () => {
     const user = getPersona();
