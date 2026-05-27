@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mortgages | Platform Sim</title>
+    <title>Mortgages | Clara</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
         .tabs {
@@ -273,11 +273,24 @@
             return;
         }
         
-        // Very simplified mock math
-        const rateDiff = (oldRate - newRate) / 100;
-        const yearlySavings = currentUser.mortgage.balance * rateDiff;
-        const monthlySavings = yearlySavings / 12;
-        const totalSavings = yearlySavings * currentUser.mortgage.termRemaining;
+        // Actual mortgage amortization formula
+        const P = currentUser.mortgage.balance;
+        const n = currentUser.mortgage.termRemaining * 12;
+        
+        // Calculate new monthly payment
+        const rNew = newRate / 100 / 12;
+        let pmtNew = 0;
+        if (rNew > 0) {
+            pmtNew = P * (rNew * Math.pow(1 + rNew, n)) / (Math.pow(1 + rNew, n) - 1);
+        } else {
+            pmtNew = P / n;
+        }
+        
+        const oldMonthly = currentUser.mortgage.monthly;
+        const monthlySavings = oldMonthly - pmtNew;
+        
+        // Calculate total savings
+        const totalSavings = (oldMonthly * n) - (pmtNew * n);
         
         document.getElementById('refi-monthly-save').textContent = formatCurrency(monthlySavings);
         document.getElementById('refi-total-save').textContent = formatCurrency(totalSavings);

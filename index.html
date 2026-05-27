@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eVerify | Platform Sim</title>
+    <title>eVerify | Clara</title>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -31,9 +31,14 @@
             
             <label class="text-muted" style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem;">Personal Number</label>
             <input type="text" id="personal-number" class="login-input" placeholder="e.g. 370101-10001">
-            <small class="text-muted" style="display: block; margin-top: -10px; margin-bottom: 15px;">
-                Demo users: <b>370101-10001</b> (Marta), <b>370101-20002</b> (Andris), <b>370101-30003</b> (Ingrid)
-            </small>
+            <div style="margin-top: -5px; margin-bottom: 20px;">
+                <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 8px;">Quick Demo Accounts:</p>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn btn-outline" style="padding: 6px 12px; font-size: 0.8rem;" onclick="fillDemo('370101-10001')">👩 Marta (Young Pro)</button>
+                    <button class="btn btn-outline" style="padding: 6px 12px; font-size: 0.8rem;" onclick="fillDemo('370101-20002')">👨 Andris (Mid-Career)</button>
+                    <button class="btn btn-outline" style="padding: 6px 12px; font-size: 0.8rem;" onclick="fillDemo('370101-30003')">👵 Ingrid (Pre-Retirement)</button>
+                </div>
+            </div>
         </div>
 
         <button class="btn btn-primary" style="width: 100%; padding: 14px;" onclick="startLogin()">Verify Identity</button>
@@ -49,6 +54,11 @@
 
 <script src="assets/js/data.js"></script>
 <script>
+    function fillDemo(id) {
+        document.getElementById('personal-number').value = id;
+        startLogin();
+    }
+
     function startLogin() {
         const idInput = document.getElementById('personal-number').value.trim();
         if (!idInput) {

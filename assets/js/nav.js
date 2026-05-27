@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <path d="M2 17L12 22L22 17" stroke="var(--color-brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 <path d="M2 12L12 17L22 12" stroke="var(--color-brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            Platform<span>Sim</span>
+            Clara
         </div>
         <ul class="nav-links">
             <li><a href="dashboard.html" id="nav-dashboard">Dashboard</a></li>

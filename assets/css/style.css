@@ -391,7 +391,7 @@ a:hover {
 .hidden { display: none !important; }
 
 /* Mobile and Tablet Responsiveness */
-@media (max-width: 900px) {
+@media (max-width: 600px) {
     .app-container {
         display: block;
     }
