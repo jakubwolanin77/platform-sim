@@ -102,7 +102,7 @@
                         <div>
                             <p class="text-muted mb-2">Market rates fluctuate. If you can secure a lower rate, refinancing could save you thousands over the loan term.</p>
                             <label class="text-muted mb-1" style="display: block; font-size: 0.9rem;">Target New Rate (%)</label>
-                            <input type="number" id="refi-rate" value="3.5" step="0.1" style="padding: 10px; border-radius: 8px; border: 1px solid var(--color-bg-alt); width: 150px; margin-bottom: 20px;">
+                            <input type="number" id="refi-rate" value="3.5" step="0.1" style="padding: 10px; border-radius: 8px; border: 1px solid var(--color-bg-alt); width: 150px; margin-bottom: 20px;" oninput="calculateRefinance()">
                             <button class="btn btn-outline" onclick="calculateRefinance()">Calculate Savings</button>
                         </div>
                         <div class="card card-dark" style="margin-bottom: 0;">
@@ -127,7 +127,7 @@
                         <div>
                             <p class="text-muted mb-2">Adding a little extra to your monthly payment goes directly to the principal, drastically reducing total interest.</p>
                             <label class="text-muted mb-1" style="display: block; font-size: 0.9rem;">Extra Monthly Payment (€)</label>
-                            <input type="number" id="inc-extra" value="100" step="50" style="padding: 10px; border-radius: 8px; border: 1px solid var(--color-bg-alt); width: 150px; margin-bottom: 20px;">
+                            <input type="number" id="inc-extra" value="100" step="50" style="padding: 10px; border-radius: 8px; border: 1px solid var(--color-bg-alt); width: 150px; margin-bottom: 20px;" oninput="calculateIncrease()">
                             <button class="btn btn-outline" onclick="calculateIncrease()">Calculate Impact</button>
                         </div>
                         <div class="card card-dark" style="margin-bottom: 0;">
@@ -301,12 +301,25 @@
         const extra = parseFloat(document.getElementById('inc-extra').value);
         if (isNaN(extra) || extra <= 0) return;
         
-        // Mock math: Assume 100 extra saves ~0.5 years per 10k balance
-        const baseImpact = extra / 100;
-        const factor = currentUser.mortgage.balance / 50000;
-        const yearsSaved = Math.min(currentUser.mortgage.termRemaining - 1, baseImpact * factor);
+        const P = currentUser.mortgage.balance;
+        const r = (currentUser.mortgage.rate / 100) / 12;
+        const currentPmt = currentUser.mortgage.monthly;
+        const newPmt = currentPmt + extra;
         
-        const interestSaved = yearsSaved * 12 * (currentUser.mortgage.monthly * 0.4); // rough mock
+        let newMonths = 0;
+        if (P * r >= newPmt) {
+            newMonths = currentUser.mortgage.termRemaining * 12;
+        } else {
+            newMonths = -Math.log(1 - (P * r) / newPmt) / Math.log(1 + r);
+        }
+        
+        const oldMonths = currentUser.mortgage.termRemaining * 12;
+        const monthsSaved = Math.max(0, oldMonths - newMonths);
+        const yearsSaved = monthsSaved / 12;
+        
+        const oldTotal = currentPmt * oldMonths;
+        const newTotal = newPmt * newMonths;
+        const interestSaved = Math.max(0, oldTotal - newTotal);
         
         document.getElementById('inc-years-save').textContent = `${yearsSaved.toFixed(1)} years`;
         document.getElementById('inc-total-save').textContent = formatCurrency(interestSaved);
