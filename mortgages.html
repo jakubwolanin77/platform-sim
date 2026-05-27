@@ -62,10 +62,44 @@
             </div>
         </header>
 
-        <div id="no-mortgage" class="card text-center hidden">
-            <h2 class="mb-2">No Active Mortgage</h2>
-            <p class="text-muted mb-3">You do not currently have an active mortgage linked to your profile.</p>
-            <button class="btn btn-primary" onclick="alert('In a real app, this would open a form to manually add a mortgage or link a bank.')">Add Mortgage Manually</button>
+        <div id="no-mortgage" class="hidden">
+            <div class="card card-dark text-center mb-3" style="padding: 3rem;">
+                <h2 class="mb-2">Looking to buy a home?</h2>
+                <p style="color: var(--color-bg-alt); max-width: 600px; margin: 1rem auto 2rem;">You don't currently have an active mortgage linked to your profile. If you're planning to buy real estate soon, we can help you find the best rates on the market.</p>
+                <button class="btn btn-primary" onclick="alert('In a real app, this would open a form to manually add an existing mortgage.')">Link Existing Mortgage</button>
+            </div>
+            
+            <h3 class="mb-2">Top Mortgage Offers for First-Time Buyers</h3>
+            <p class="text-muted mb-3">Based on your profile, these are the most competitive rates available today.</p>
+            
+            <div style="background: var(--color-white); border-radius: var(--border-radius-card); border: 1px solid var(--color-bg-alt); overflow: hidden; box-shadow: var(--shadow-card);">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <tr style="background: var(--color-bg-alt); color: var(--color-brand-dark);">
+                        <th style="padding: 16px;">Provider</th>
+                        <th style="padding: 16px;">Type</th>
+                        <th style="padding: 16px;">Interest Rate</th>
+                        <th style="padding: 16px;">Action</th>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--color-bg-alt);">
+                        <td style="padding: 16px; font-weight: 600;">Luminor</td>
+                        <td style="padding: 16px;">First-Time Buyer Special</td>
+                        <td style="padding: 16px; color: var(--color-positive); font-weight: bold;">3.1%</td>
+                        <td style="padding: 16px;"><button class="btn btn-primary" style="padding: 6px 16px; font-size: 0.8rem;">Get Pre-approved</button></td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--color-bg-alt);">
+                        <td style="padding: 16px; font-weight: 600;">Swedbank</td>
+                        <td style="padding: 16px;">Fixed (5 years)</td>
+                        <td style="padding: 16px; font-weight: bold;">3.4%</td>
+                        <td style="padding: 16px;"><button class="btn btn-outline" style="padding: 6px 16px; font-size: 0.8rem;">Get Pre-approved</button></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 16px; font-weight: 600;">Citadele</td>
+                        <td style="padding: 16px;">Green Mortgage (A-class homes)</td>
+                        <td style="padding: 16px; font-weight: bold;">2.9%</td>
+                        <td style="padding: 16px;"><button class="btn btn-outline" style="padding: 6px 16px; font-size: 0.8rem;">Get Pre-approved</button></td>
+                    </tr>
+                </table>
+            </div>
         </div>
 
         <div id="has-mortgage" class="hidden">
