@@ -273,9 +273,12 @@
             return;
         }
         
-        // Actual mortgage amortization formula
         const P = currentUser.mortgage.balance;
         const n = currentUser.mortgage.termRemaining * 12;
+        
+        // Calculate true old monthly payment (ignoring flawed mock data)
+        const rOld = oldRate / 100 / 12;
+        const pmtOld = P * (rOld * Math.pow(1 + rOld, n)) / (Math.pow(1 + rOld, n) - 1);
         
         // Calculate new monthly payment
         const rNew = newRate / 100 / 12;
@@ -286,11 +289,8 @@
             pmtNew = P / n;
         }
         
-        const oldMonthly = currentUser.mortgage.monthly;
-        const monthlySavings = oldMonthly - pmtNew;
-        
-        // Calculate total savings
-        const totalSavings = (oldMonthly * n) - (pmtNew * n);
+        const monthlySavings = pmtOld - pmtNew;
+        const totalSavings = (pmtOld * n) - (pmtNew * n);
         
         document.getElementById('refi-monthly-save').textContent = formatCurrency(monthlySavings);
         document.getElementById('refi-total-save').textContent = formatCurrency(totalSavings);
@@ -302,22 +302,24 @@
         if (isNaN(extra) || extra <= 0) return;
         
         const P = currentUser.mortgage.balance;
+        const n = currentUser.mortgage.termRemaining * 12;
         const r = (currentUser.mortgage.rate / 100) / 12;
-        const currentPmt = currentUser.mortgage.monthly;
-        const newPmt = currentPmt + extra;
+        
+        // Calculate true baseline payment
+        const pmtOld = P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+        const newPmt = pmtOld + extra;
         
         let newMonths = 0;
         if (P * r >= newPmt) {
-            newMonths = currentUser.mortgage.termRemaining * 12;
+            newMonths = n;
         } else {
             newMonths = -Math.log(1 - (P * r) / newPmt) / Math.log(1 + r);
         }
         
-        const oldMonths = currentUser.mortgage.termRemaining * 12;
-        const monthsSaved = Math.max(0, oldMonths - newMonths);
+        const monthsSaved = Math.max(0, n - newMonths);
         const yearsSaved = monthsSaved / 12;
         
-        const oldTotal = currentPmt * oldMonths;
+        const oldTotal = pmtOld * n;
         const newTotal = newPmt * newMonths;
         const interestSaved = Math.max(0, oldTotal - newTotal);
         
